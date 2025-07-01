@@ -24,6 +24,8 @@ jobs:
   plan:
  if: github.event_name == 'push' || github.event.inputs.action == 'plan'
     runs-on: ubuntu-latest
+    environment:
+      name: plan-approval
     env:
       TF_ENV: ${{ github.event.inputs.environment }}
       AWS_ACCESS_KEY_ID: ${{ secrets.ACCESS_KEY }}
@@ -53,8 +55,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       TF_ENV: ${{ github.event.inputs.environment }}
-      AWS_ACCESS_KEY_ID: ${{ secrets.access_key }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.secret_key }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.ACCESS_KEY }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.SECRET_KEY }}
 
     steps:
       - name: Checkout code
