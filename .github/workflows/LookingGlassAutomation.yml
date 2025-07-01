@@ -49,7 +49,7 @@ jobs:
         working-directory: looking_glass/environment/dev
 
       - name: Terraform Plan
-        run: terraform plan -var-file=dev.tfvars.tfvars
+        run: terraform plan -var-file=dev.tfvars
         working-directory: looking_glass/environment/dev
 
 
