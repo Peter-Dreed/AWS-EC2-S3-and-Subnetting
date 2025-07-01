@@ -10,15 +10,6 @@ on:
         description: 'Choose environment (dev, prod)'
         required: true
         default: 'dev'
-      action:
-        description: 'Choose action (plan, apply, destroy)'
-        required: true
-        default: 'plan'
-        type: choice
-        options:
-          - plan
-          - apply
-          - destroy
 
 jobs:
   plan:
