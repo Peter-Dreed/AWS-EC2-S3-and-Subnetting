@@ -10,3 +10,5 @@ module "compute" {
   public_subnet_id = module.network.public_subnet_id
   user_data_file   = ("${path.module}/install-nginx.sh")
 }
+
+#push#
