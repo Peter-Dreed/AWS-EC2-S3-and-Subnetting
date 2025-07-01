@@ -6,24 +6,30 @@ on:
       - main
   workflow_dispatch:
     inputs:
-      destroy:
-        description: 'Set to true to destroy infrastructure after apply'
-        required: false
-        default: 'false'
+      action:
+        description: 'Type plan, apply or destroy'
+        required: true
+        default: 'plan'
+      environment:
+        description: 'Type the environment (e.g., dev, prod)'
+        required: true
+        default: 'dev'
+
+permissions:
+  contents: read
+
+env:
+  TF_ENV: ${{ github.event.inputs.environment || 'dev' }}
+  AWS_ACCESS_KEY_ID: ${{ secrets.ACCESS_KEY }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.SECRET_KEY }}
+  TF_DIR: looking_glass/environment/dev
 
 jobs:
-  plan:
-    if: ${{ github.event_name == 'push' || github.event.inputs.action == 'plan' }}
+  terraform:
     runs-on: ubuntu-latest
-    environment:
-      name: plan-approval
-    env:
-      TF_ENV: ${{ github.event.inputs.environment }}
-      AWS_ACCESS_KEY_ID: ${{ secrets.ACCESS_KEY }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.SECRET_KEY }}
 
     steps:
-      - name: Checkout code
+      - name: Checkout Code
         uses: actions/checkout@v3
 
       - name: Setup Terraform
@@ -32,67 +38,28 @@ jobs:
           terraform_version: 1.7.5
 
       - name: Terraform Init
+        env:
+          name: plan-approval
         run: terraform init
-        working-directory: looking_glass/environment/dev
-        
+        working-directory: ${{ env.TF_DIR }}
+
       - name: Terraform Validate
         run: terraform validate
-        working-directory: looking_glass/environment/dev
+        working-directory: ${{ env.TF_DIR }}
 
       - name: Terraform Plan
+        if: github.event_name == 'push' || github.event.inputs.action == 'plan'
         run: terraform plan -var-file=dev.tfvars
-        working-directory: looking_glass/environment/dev
-
-
-  apply:
-    if: ${{ github.event.inputs.action == 'apply' }}
-    runs-on: ubuntu-latest
-    env:
-      TF_ENV: ${{ github.event.inputs.environment }}
-      AWS_ACCESS_KEY_ID: ${{ secrets.ACCESS_KEY }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.SECRET_KEY }}
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v2
-        with:
-          terraform_version: 1.7.5
-
-      - name: Terraform Init
-        run: terraform init
-        working-directory: looking_glass/environment/dev
+        working-directory: ${{ env.TF_DIR }}
 
       - name: Terraform Apply
+        if: github.event.inputs.action == 'apply'
         run: terraform apply -var-file=dev.tfvars -auto-approve
-        working-directory: looking_glass/environment/dev
-
-  destroy:
-    if: ${{ github.event.inputs.action == 'destroy' }}
-    runs-on: ubuntu-latest
-    environment:
-      name: destroy-approval
-    env:
-      TF_ENV: ${{ github.event.inputs.environment }}
-      AWS_ACCESS_KEY_ID: ${{ secrets.ACCESS_KEY }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.SECRET_KEY }}
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v2
-        with:
-          terraform_version: 1.7.5
-
-      - name: Terraform Init
-        run: terraform init
-        working-directory: looking_glass/environment/dev
+        working-directory: ${{ env.TF_DIR }}
 
       - name: Terraform Destroy
+        env:
+          name: destroy-approval
+        if: github.event.inputs.action == 'destroy'
         run: terraform destroy -var-file=dev.tfvars -auto-approve
-        working-directory: looking_glass/environment/dev
-
+        working-directory: ${{ env.TF_DIR }}
