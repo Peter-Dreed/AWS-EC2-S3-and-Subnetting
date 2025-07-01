@@ -49,7 +49,7 @@ jobs:
         working-directory: looking_glass/environment/dev
 
       - name: Terraform Plan
-        run: terraform plan -var-file=${{ env.TF_ENV }}.tfvars
+        run: terraform plan -var-file=dev.tfvars.tfvars
         working-directory: looking_glass/environment/dev
 
 
@@ -75,7 +75,7 @@ jobs:
         working-directory: looking_glass/environment/dev
 
       - name: Terraform Apply
-        run: terraform apply -var-file=${{ env.TF_ENV }}.tfvars -auto-approve
+        run: terraform apply -var-file=dev.tfvars -auto-approve
         working-directory: looking_glass/environment/dev
 
   destroy:
@@ -102,6 +102,6 @@ jobs:
         working-directory: looking_glass/environment/dev
 
       - name: Terraform Destroy
-        run: terraform destroy -var-file=${{ env.TF_ENV }}.tfvars -auto-approve
+        run: terraform destroy -var-file=dev.tfvars -auto-approve
         working-directory: looking_glass/environment/dev
 
