@@ -42,15 +42,15 @@ jobs:
 
       - name: Terraform Init
         run: terraform init
-        working-directory: looking glass/environment/dev
+        working-directory: looking_glass/environment/dev
         
       - name: Terraform Validate
         run: terraform validate
-        working-directory: looking glass/environment/dev
+        working-directory: looking_glass/environment/dev
 
       - name: Terraform Plan
         run: terraform plan -var-file=${{ env.TF_ENV }}.tfvars
-        working-directory: looking glass/environment/dev
+        working-directory: looking_glass/environment/dev
 
 
   apply:
@@ -72,11 +72,11 @@ jobs:
 
       - name: Terraform Init
         run: terraform init
-        working-directory: looking glass/environment/dev
+        working-directory: looking_glass/environment/dev
 
       - name: Terraform Apply
         run: terraform apply -var-file=${{ env.TF_ENV }}.tfvars -auto-approve
-        working-directory: looking glass/environment/dev
+        working-directory: looking_glass/environment/dev
 
   destroy:
     if: ${{ github.event.inputs.action == 'destroy' }}
@@ -99,9 +99,9 @@ jobs:
 
       - name: Terraform Init
         run: terraform init
-        working-directory: looking glass/environment/dev
+        working-directory: looking_glass/environment/dev
 
       - name: Terraform Destroy
         run: terraform destroy -var-file=${{ env.TF_ENV }}.tfvars -auto-approve
-        working-directory: looking glass/environment/dev
+        working-directory: looking_glass/environment/dev
 
