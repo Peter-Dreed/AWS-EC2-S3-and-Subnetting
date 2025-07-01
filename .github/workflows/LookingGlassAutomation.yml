@@ -6,10 +6,10 @@ on:
       - main
   workflow_dispatch:
     inputs:
-      environment:
-        description: 'Choose environment (dev, prod)'
-        required: true
-        default: 'dev'
+      destroy:
+        description: 'Set to true to destroy infrastructure after apply'
+        required: false
+        default: 'false'
 
 jobs:
   plan:
