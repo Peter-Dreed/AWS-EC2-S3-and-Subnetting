@@ -1,1 +1,99 @@
+name: Terraform Workflow
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Choose environment (dev, prod)'
+        required: true
+        default: 'dev'
+      action:
+        description: 'Choose action (plan, apply, destroy)'
+        required: true
+        default: 'plan'
+        type: choice
+        options:
+          - plan
+          - apply
+          - destroy
+
+jobs:
+  plan:
+    if: ${{ github.event.inputs.action == 'plan' }}
+    runs-on: ubuntu-latest
+    env:
+      TF_ENV: ${{ github.event.inputs.environment }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.access_key }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.secret_key }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.6.6
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Terraform Plan
+        run: terraform plan -var-file=${{ env.TF_ENV }}.tfvars
+
+
+  apply:
+    if: ${{ github.event.inputs.action == 'apply' }}
+    runs-on: ubuntu-latest
+    env:
+      TF_ENV: ${{ github.event.inputs.environment }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.access_key }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.secret_key }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.6.6
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Apply
+        run: terraform apply -var-file=${{ env.TF_ENV }}.tfvars -auto-approve
+
+
+  destroy:
+    if: ${{ github.event.inputs.action == 'destroy' }}
+    runs-on: ubuntu-latest
+    environment:
+      name: destroy-approval
+    env:
+      TF_ENV: ${{ github.event.inputs.environment }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.ACCESS_KEY }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.SECRET_KEY }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.6.6
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Destroy
+        run: terraform destroy -var-file=${{ env.TF_ENV }}.tfvars -auto-approve
 
