@@ -13,8 +13,6 @@ environment/
     dev.tfvars
     output.tf
     install-nginx.sh
-    .terraform.lock.hcl
-    .terraform/
 modules/
   network/
     main.tf
